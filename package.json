@@ -9,9 +9,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "A fullstack todo application that uses a NodeJs backend, a SQLite database and JWT Authentication",
   "dependencies": {
-    "express": "^4.21.2"
+    "bcryptjs": "^3.0.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
