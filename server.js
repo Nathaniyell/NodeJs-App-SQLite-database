@@ -9,6 +9,8 @@ const PORT = process.env.PORT || 5007
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+//Middlewares
+app.use(express.json())
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "public")));
 
