@@ -24,7 +24,7 @@ app.get("/", (req, res) => {
 
 //ROUTES
 app.use('/auth', authRoutes)
-app.use('/todo', todoRoutes)
+app.use('/todos', todoRoutes)
 
 
 app.listen(PORT, () => {
