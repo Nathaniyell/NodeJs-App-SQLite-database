@@ -31,19 +31,26 @@ router.post('/register', (req, res) => {
 })
 
 router.post('/login', (req, res) => {
-    const { username, password } = req.body
-    try {
-        const getUser = db.prepare('SELECT * FROM users WHERE username = ?')
-        const user = getUser.get(username)
-          // if we cannot find a user associated with that username, return out from the function
-          if (!user) { return res.status(404).send({ message: "User not found" }) }
-          
-    } catch (error) {
-        console.log(error.message)
-        res.sendStatus(503)
+    console.log("Received body:", req.body);
+    
+    const { username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
     }
-    console.log(username, password)
-    // res.sendStatus(201)
+
+    try {
+        const getUser = db.prepare('SELECT * FROM users WHERE username = ?');
+        const user = getUser.get(username);
+
+        if (!user) {
+            return res.status(404).send({ message: "User not found" });
+        }
+        console.log("User found:", user);
+        res.json({ message: "Login successful", user });
+    } catch (error) {
+        console.error("Database error:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 })
 
 
