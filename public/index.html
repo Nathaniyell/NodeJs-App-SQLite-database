@@ -14,22 +14,20 @@
 
 <body>
     <section id="auth">
-        <div>
-            <h2 className="sign-up-text">Login</h2>
+        <form id="authForm" onsubmit="authenticate(event)">
+            <h2 class="sign-up-text">Login</h2>
             <p>Create an account!</p>
-        </div>
 
-        <p id="error" style="display: none;"></p>
-        <input id="emailInput" placeholder="Email" />
-        <input id="passwordInput" placeholder="********" type="password" />
-        <button id="authBtn" onclick="authenticate()">
-            Submit
-        </button>
-        <hr />
-        <div class="register-content">
-            <p>Don&apos;t have an account?</p>
-            <button onclick="toggleIsRegister()" id="registerBtn">Sign up</button>
-        </div>
+            <p id="error" style="display: none;"></p>
+
+            <input id="emailInput" name="email" placeholder="Email" required />
+            <input id="passwordInput" name="password" placeholder="********" type="password" required />
+            <div class="register-content">
+                <p>Don&apos;t have an account?</p>
+                <button onclick="toggleIsRegister()" type="button" id="registerBtn">Sign up</button>
+            </div>
+            <button id="authBtn" type="submit">Submit</button>
+        </form>
     </section>
     <header style="display: none;">
         <h1 class="text-gradient">You have 0 open tasks.</h1>
@@ -60,7 +58,7 @@
     let selectedTab = 'All'
     let todos = []
 
-    const apiBase = '/'
+    const apiBase = 'http://localhost:5007/'
 
     // elements
     const nav = document.querySelector('nav')
@@ -169,78 +167,50 @@
     async function toggleIsRegister() {
         isRegistration = !isRegistration
         registerBtn.innerText = isRegistration ? 'Sign in' : 'Sign up'
-        document.querySelector('#auth > div h2').innerText = isRegistration ? 'Sign Up' : 'Login'
-        document.querySelector('.register-content p').innerText = isRegistration ? 'Already have an account?' : 'Don\'t have an account?'
+        document.querySelector('.sign-up-text').innerText = isRegistration ? 'Sign Up' : 'Login'
+        document.querySelector('.register-content > p').innerText = isRegistration ? 'Already have an account?' : 'Don\'t have an account?'
         document.querySelector('.register-content button').innerText = isRegistration ? 'Sign in' : 'Sign up'
     }
+    async function authenticate(event) {
+    event.preventDefault(); 
+    console.log("Submit button clicked");
 
-    async function authenticate() {
-        // access email and pass values
-        const emailVal = email.value
-        const passVal = password.value
+    const emailVal = document.getElementById("emailInput").value.trim();
+    const passVal = document.getElementById("passwordInput").value.trim();
 
-        // guard clauses... if authenticating, return
-        if (
-            isLoading ||
-            isAuthenticating ||
-            !emailVal ||
-            !passVal ||
-            passVal.length < 6 ||
-            !emailVal.includes('@')
-        ) { return }
-
-        // reset error and set isAuthenticating to true
-        error.style.display = 'none'
-        isAuthenticating = true
-        authBtn.innerText = 'Authenticating...'
-
-        try {
-            let data
-            if (isRegistration) {
-                // register an account
-                const response = await fetch(apiBase + 'auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: emailVal, password: passVal })
-                })
-                data = await response.json()
-            } else {
-                // login an account
-                const response = await fetch(apiBase + 'auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: emailVal, password: passVal })
-                })
-                data = await response.json()
-            }
-
-            if (data.token) {
-                token = data.token
-                localStorage.setItem('token', token)
-
-                // authenicating into loading
-                authBtn.innerText = 'Loading...'
-
-                // fetch todos
-                await fetchTodos()
-
-                // show dashboard
-                showDashboard()
-            } else {
-                throw Error('❌ Failed to authenticate...')
-            }
-
-        } catch (err) {
-            console.log(err.message)
-            error.innerText = err.message
-            error.style.display = 'block'
-        } finally {
-            authBtn.innerText = 'Submit'
-            isAuthenticating = false
-        }
-
-
+    if (!emailVal || !passVal || passVal.length < 6 || !emailVal.includes("@")) {
+        alert("Invalid input. Please enter a valid email and password.");
+        return;
     }
+
+    const authBtn = document.getElementById("authBtn");
+    authBtn.innerText = "Authenticating...";
+    authBtn.disabled = true;
+
+    try {
+        const endpoint = isRegistration ? "auth/register" : "auth/login";
+        const response = await fetch(`http://localhost:5007/${endpoint}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: emailVal, password: passVal })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) throw new Error(data.message || "Authentication failed");
+
+        localStorage.setItem("token", data.token);
+        alert("Login successful!");
+        window.location.reload(); // Reload page to show dashboard
+    } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("error").innerText = error.message;
+        document.getElementById("error").style.display = "block";
+    } finally {
+        authBtn.innerText = "Submit";
+        authBtn.disabled = false;
+    }
+}
 
     function logout() {
         // wipe states and clear cached token

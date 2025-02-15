@@ -6,6 +6,7 @@ import db from "../db.js";
 const router = express.Router()
 
 router.post('/register', (req, res) => {
+    console.log(req.body)
     const { username, password } = req.body
 
     //encrypt the password
@@ -32,6 +33,7 @@ router.post('/register', (req, res) => {
 
 router.post('/login', (req, res) => {
     const { username, password } = req.body;
+    console.log(req.body)
     if (!username || !password) {
         return res.status(400).json({ message: "Username and password are required" });
     }
