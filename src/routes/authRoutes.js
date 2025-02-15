@@ -31,8 +31,6 @@ router.post('/register', (req, res) => {
 })
 
 router.post('/login', (req, res) => {
-    console.log("Received body:", req.body);
-
     const { username, password } = req.body;
     if (!username || !password) {
         return res.status(400).json({ message: "Username and password are required" });
@@ -54,16 +52,13 @@ router.post('/login', (req, res) => {
             return res.status(401).send({ message: "Invalid Password" });
         }
         //If password is correct then we have a successful login
-        console.log("User found:", user);
-        res.json({ message: "Login successful", user });
+        console.log(user);
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "24h" })
+        res.json({ token });
     } catch (error) {
         console.error("Database error:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 })
-
-
-
-
 
 export default router
