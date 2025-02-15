@@ -32,7 +32,7 @@ router.post('/register', (req, res) => {
 
 router.post('/login', (req, res) => {
     console.log("Received body:", req.body);
-    
+
     const { username, password } = req.body;
     if (!username || !password) {
         return res.status(400).json({ message: "Username and password are required" });
@@ -42,9 +42,18 @@ router.post('/login', (req, res) => {
         const getUser = db.prepare('SELECT * FROM users WHERE username = ?');
         const user = getUser.get(username);
 
+        //If we cannot find a user associated with the entered username, stop function execution and throw an error 
         if (!user) {
             return res.status(404).send({ message: "User not found" });
         }
+        //Compare the entered password with the hashed password in the db
+        const passwordIsValid = bcrypt.compareSync(password, user.password)
+
+        //If the password does not match, stop function execution and throw an error 
+        if (!passwordIsValid) {
+            return res.status(401).send({ message: "Invalid Password" });
+        }
+        //If password is correct then we have a successful login
         console.log("User found:", user);
         res.json({ message: "Login successful", user });
     } catch (error) {
