@@ -1,7 +1,5 @@
-import { Database } from "better-sqlite3";
-
-// Create/connect to a physical database file instead of memory
-const db = new Database('database.sqlite');
+import { DatabaseSync } from 'node:sqlite'
+const db = new DatabaseSync(':memory:')
 
 //Execute SQL statements from strings
 db.exec(`
