@@ -21,18 +21,24 @@ router.post('/', (req, res) => {
 
 //Update a todo
 router.put('/:id', (req, res) => {
-    const { completed, task } = req.body
+    const { completed, task } = req.body;
     //The id on the url is gotten from the url params
-    const { id } = req.params
-    let updatedTodo = db.prepare('UPDATE todos SET completed = ? WHERE id = ?')
-    if(task !== ""){
-       updatedTodo = db.prepare('UPDATE todos SET task = ? WHERE id = ?')
-       updatedTodo.run(task, id)
-    }
-    updatedTodo.run(completed, id)
+    const { id } = req.params;
 
-    res.json({message: "Todo updated successfully"})
-})
+    try {
+        if (task !== "" && completed !== undefined) {
+            db.prepare('UPDATE todos SET task = ?, completed = ? WHERE id = ?').run(task, completed, id);
+        } else if (task !== "") {
+            db.prepare('UPDATE todos SET task = ? WHERE id = ?').run(task, id);
+        } else if (completed !== undefined) {
+            db.prepare('UPDATE todos SET completed = ? WHERE id = ?').run(completed, id);
+        }
+
+        res.json({ message: "Todo updated successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "An error occurred while updating the todo" });
+    }
+});
 
 
 //Delete a todo
