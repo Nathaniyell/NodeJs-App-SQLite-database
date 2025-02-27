@@ -21,7 +21,17 @@ router.post('/', (req, res) => {
 
 //Update a todo
 router.put('/:id', (req, res) => {
-    
+    const { completed, task } = req.body
+    //The id on the url is gotten from the url params
+    const { id } = req.params
+    let updatedTodo = db.prepare('UPDATE todos SET completed = ? WHERE id = ?')
+    if(task !== ""){
+       updatedTodo = db.prepare('UPDATE todos SET task = ? WHERE id = ?')
+       updatedTodo.run(task, id)
+    }
+    updatedTodo.run(completed, id)
+
+    res.json({message: "Todo updated successfully"})
 })
 
 
