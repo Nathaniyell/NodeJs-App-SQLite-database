@@ -16,6 +16,7 @@ router.post('/', (req, res) => {
     const insertTodo = db.prepare(`INSERT into todos (user_id, task) VALUES (?, ?)`)
     //the user_id specifies which user's table the task should be added to and not just any random user on the data base or all the users on the db
     insertTodo.run(req.userId, task)
+    res.json({ id: insertTodo.lastID, task, completed: 0 })
 })
 
 //Update a todo
