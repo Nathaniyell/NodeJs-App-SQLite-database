@@ -200,7 +200,7 @@
         if (!response.ok) throw new Error(data.message || "Authentication failed");
 
         localStorage.setItem("token", data.token);
-        alert("Login successful!");
+        // alert("Login successful!");
         window.location.reload(); // Reload page to show dashboard
     } catch (error) {
         console.error("Error:", error);
