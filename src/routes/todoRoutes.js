@@ -40,7 +40,6 @@ router.put('/:id', (req, res) => {
     }
 });
 
-
 //Delete a todo
 router.delete('/:id', (req, res) => {
     const { id } = req.params
@@ -49,8 +48,6 @@ router.delete('/:id', (req, res) => {
 
     res.send({message: "Todo Deleted"})
 })
-
-
 
 
 
