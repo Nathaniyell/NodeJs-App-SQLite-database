@@ -72,9 +72,7 @@
     const registerBtn = document.getElementById('registerBtn')
     const authBtn = document.getElementById('authBtn')
     const addTodoBtn = document.getElementById('addTodoBtn')
-    // const deleteBtn = document.getElementById('')
-    // const updateBtn = 
-
+   
     // PAGE RENDERING LOGIC
     async function showDashboard() {
         nav.style.display = 'block'
@@ -200,7 +198,7 @@
         if (!response.ok) throw new Error(data.message || "Authentication failed");
 
         localStorage.setItem("token", data.token);
-        // alert("Login successful!");
+     
         window.location.reload(); // Reload page to show dashboard
     } catch (error) {
         console.error("Error:", error);
