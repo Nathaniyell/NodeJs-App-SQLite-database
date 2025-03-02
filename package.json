@@ -12,9 +12,12 @@
   "license": "ISC",
   "description": "A dockerized fullstack application that uses a NodeJs backend, a PostgreSQL database, a Prisma ORM, and JWT Authentication",
   "dependencies": {
+    "@prisma/client": "^6.4.1",
     "bcryptjs": "^3.0.0",
     "express": "^4.21.2",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.3",
+    "prisma": "^6.4.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
