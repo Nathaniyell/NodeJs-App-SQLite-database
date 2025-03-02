@@ -1,52 +1,64 @@
 import express from "express";
 import db from "../db.js";
+import prisma from "../prismaClient.js";
 
 const router = express.Router()
 
 //Get all todos for login user
-router.get('/', (req, res) => {
-    const getTodos = db.prepare('SELECT * FROM todos WHERE user_id = ?')
-    const todos = getTodos.all(req.userId)
+router.get('/', async (req, res) => {
+    const todos = await prisma.todo.findMany({
+        where: {
+            userId: req.userId
+        }
+    })
     res.json(todos)
 })
 
 //Create a new todo
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     const { task } = req.body;
-    const insertTodo = db.prepare(`INSERT into todos (user_id, task) VALUES (?, ?)`)
-    //the user_id specifies which user's table the task should be added to and not just any random user on the data base or all the users on the db
-    const result = insertTodo.run(req.userId, task)
-    res.json({ id: result.lastInsertRowid, task, completed: 0 })
+    const todo = await prisma.todo.create({
+        data: {
+            task,
+            userId: req.userId
+        }
+    })
+    res.json(todo)
 })
 
 //Update a todo
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
     const { completed, task } = req.body;
     //The id on the url is gotten from the url params
     const { id } = req.params;
 
     try {
-        if (task !== "" && completed !== undefined) {
-            db.prepare('UPDATE todos SET task = ?, completed = ? WHERE id = ?').run(task, completed, id);
-        } else if (task !== "") {
-            db.prepare('UPDATE todos SET task = ? WHERE id = ?').run(task, id);
-        } else if (completed !== undefined) {
-            db.prepare('UPDATE todos SET completed = ? WHERE id = ?').run(completed, id);
-        }
-
-        res.json({ message: "Todo updated successfully" });
+        const updatedTodo = await prisma.todo.update({
+            where: {
+                id: parseInt(id),
+                userId: req.userId
+            },
+            data: {
+                completed: !!completed
+            }
+        })
+        res.json(updatedTodo);
     } catch (error) {
         res.status(500).json({ error: "An error occurred while updating the todo" });
     }
 });
 
 //Delete a todo
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     const { id } = req.params
-    const deleteTodo = db.prepare('DELETE FROM todos WHERE id = ? AND user_id = ?')
-    deleteTodo.run(id, req.userId)
+    await prisma.todo.delete({
+        where: {
+            id: parseInt(id),
+            userId: req.userId
+        }
+    })
 
-    res.send({message: "Todo Deleted"})
+    res.send({ message: "Todo Deleted" })
 })
 
 
